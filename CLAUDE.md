@@ -19,7 +19,7 @@ A website for Jim and Suzanne to plan and record visits and activities around Ir
 ## Features
 
 ### MVP
-- [ ] Interactive map of Ireland showing counties, with visited counties highlighted
+- [x] Interactive map of Ireland showing counties, with visited counties highlighted (first version: tap a county to mark it visited)
 - [ ] Wishlist of places we want to go
 - [ ] Plan activities in a county — one each for Jim and Suzanne
 - [ ] Log a visit (place, date, notes)
@@ -46,7 +46,7 @@ A website for Jim and Suzanne to plan and record visits and activities around Ir
 - **Person:** Jim, Suzanne
 - **Photo:** (later)
 
-**Reference data** (county boundaries, place info): not settled. OpenStreetMap is the likely option — Claude to recommend.
+**Reference data:** County boundaries are the 32 traditional counties from OpenStreetMap (ODbL), simplified to ~100 m detail and saved as `assets/counties.geojson`. Each county has an `id` (e.g. `cork`, `londonderry`), `name`, `province` and `osm_id`. Place info: not settled yet.
 
 ## Tech Stack
 
@@ -56,9 +56,9 @@ Decided:
 - **Image storage:** None (for now)
 - **Hosting:** Self-hosted on YunoHost using the My Webapp app (installed)
 
-To decide (Claude to recommend, keeping it simple and easy to host on YunoHost):
-- **Backend:** JavaScript, Flask, or other
-- **Map library:** e.g. Leaflet + OpenStreetMap
+- **Backend:** Plain PHP (My Webapp already runs PHP 8.4, so nothing extra to install). Small JSON APIs live in `api/`.
+- **Front end:** Plain JavaScript and CSS, no build step. Code in `assets/app.js` and `assets/app.css`.
+- **Map library:** Leaflet 1.9.4, copied into `assets/vendor/leaflet/` (no CDN). Background map tiles are CARTO "Positron" (light style built from OpenStreetMap data).
 
 ## Design & UI
 
@@ -70,16 +70,17 @@ To decide (Claude to recommend, keeping it simple and easy to host on YunoHost):
 
 - **Who can see it:** Jim and Suzanne only (private site)
 - **Backups:** Yunohost Backup
-- **How to deploy:** (Claude to fill in once the stack is chosen)
+- **How to deploy:** Push to GitHub, then press "Update from GitHub" on the admin page
 - **Domain:** https://bawnaree.tail574fd7.ts.net/travelsite/
 
 ## Running the Site
 
-(Claude to fill in once the project is set up — how to install, run locally, and deploy.)
+- Home page (`index.php`) is the county map. The ⚙ icon opens `admin/` (server checks + update button).
+- Saved county status is in `DATA_DIR/counties.json`, created automatically on first use.
 
 | Task | Command |
 |------|---------|
-| Run locally | For Testing and updating|
+| Run locally | No PHP on Jim's PC yet, so test on the live site. (Opening the map without PHP shows the map but can't save.) |
 | Deploy (first time) | Clone the repo into YunoHost My Webapp using SSH from the public repo |
 | Update | Push to GitHub, then press "Update from GitHub" at `/travelsite/admin/update.php` |
 
