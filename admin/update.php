@@ -57,8 +57,8 @@ if ($canRun && $_SERVER['REQUEST_METHOD'] === 'POST') {
   h1 { font-size: 1.4rem; font-weight: 500; }
   .card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(20, 60, 110, .15); margin-bottom: 16px; }
   .label { font-size: .8rem; color: #5b6f85; text-transform: uppercase; letter-spacing: .04em; }
-  button { background: #1e6fd9; color: #fff; border: 0; border-radius: 20px; padding: 10px 24px; font-size: 1rem; cursor: pointer; }
-  button:hover { background: #1859b0; }
+  button, .button { display: inline-block; background: #1e6fd9; color: #fff; border: 0; border-radius: 20px; padding: 10px 24px; font-size: 1rem; cursor: pointer; text-decoration: none; }
+  button:hover, .button:hover { background: #1859b0; }
   pre { white-space: pre-wrap; margin: 0; font-size: .9rem; }
   .error { border-left: 4px solid #c62828; }
   .success { border-left: 4px solid #1e6fd9; }
@@ -81,6 +81,7 @@ if ($canRun && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if ($message !== null): ?>
       <div class="card <?= $ok ? 'success' : 'error' ?>"><pre><?= htmlspecialchars($message) ?></pre></div>
+      <p><a class="button" href="../">Return to map</a></p>
     <?php endif; ?>
 
     <form method="post">

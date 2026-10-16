@@ -19,7 +19,7 @@ A website for Jim and Suzanne to plan and record visits and activities around Ir
 ## Features
 
 ### MVP
-- [x] Interactive map of Ireland showing counties, with visited counties highlighted (first version: tap a county to mark it visited)
+- [x] Interactive map of Ireland showing counties, coloured by plan progress, with a colour key
 - [ ] Wishlist of places we want to go
 - [ ] Plan activities in a county — one each for Jim and Suzanne
 - [ ] Log a visit (place, date, notes)
@@ -29,21 +29,21 @@ A website for Jim and Suzanne to plan and record visits and activities around Ir
 - [ ] Dropdown for each person to choose what they want to do
 - [ ] Ratings / favourites
 - [ ] Photos
-- [ ] Four levels of map highlight per county:
-  - [ ] One person chosen
-  - [ ] Both chosen
-  - [ ] One completed
-  - [ ] Both completed
+- [x] Four levels of map highlight per county (plus "nothing planned"):
+  - [x] One person chosen
+  - [x] Both chosen
+  - [x] One completed
+  - [x] Both completed
 
 ### Ideas / Someday
 - European capital cities
 
 ## Data Model
 
-- **Place:** name, county, address
+- **Place (map pin):** name, note, who it's for (both or one person), county, lat/lng, date added — saved in `DATA_DIR/pins.json` via `api/pins.php`
 - **Visit:** place, date(s), who, notes, rating
 - **Activity:** visit, type, description
-- **Person:** Jim, Suzanne
+- **Person:** Jim, Suzanne — ids `user1` and `user2` (`PEOPLE` in `config.php`). The names shown on the map are typed in on the admin page and saved in `DATA_DIR/settings.json`; blank means "User 1" / "User 2"
 - **Photo:** (later)
 
 **Reference data:** County boundaries are the 32 traditional counties from OpenStreetMap (ODbL), simplified to ~100 m detail and saved as `assets/counties.geojson`. Each county has an `id` (e.g. `cork`, `derry`), `name`, `province` and `osm_id`. Place info: not settled yet.
