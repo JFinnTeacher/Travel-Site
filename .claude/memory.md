@@ -16,8 +16,8 @@ CLAUDE.md imports it, so Claude reads it at the start of each session.
 
 ## Current Status
 <!-- What's in progress right now, and where you left off. Update at the end of each session. -->
-- **Last worked on:**
-- **Next step:**
+- **Last worked on:** 2026-10-16 — Placeholder site live at https://bawnaree.tail574fd7.ts.net/travelsite/ (PHP 8.4.26). Server checks all green; data folder created by hand.
+- **Next step:** Choose the map library (likely Leaflet + OpenStreetMap) and start the county map (MVP).
 - **Blockers:**
 
 ## Preferences & Feedback

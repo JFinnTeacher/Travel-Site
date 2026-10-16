@@ -98,4 +98,6 @@ To decide (Claude to recommend, keeping it simple and easy to host on YunoHost):
   - the raw JSON can't be downloaded from a browser
   - the data stays inside the app folder for YunoHost backups
 
+  The app folder `/var/www/my_webapp` is owned by root, so PHP can't create `data/` itself. It was created once by hand: `sudo mkdir -p /var/www/my_webapp/data && sudo chown my_webapp:my_webapp /var/www/my_webapp/data && sudo chmod 750 /var/www/my_webapp/data`. Repeat this on any fresh install.
+
   Build with this in mind: the data path must be a setting (not hard-coded inside `www/`), data files must be listed in `.gitignore`, and the app should create empty data files on first run if none exist.

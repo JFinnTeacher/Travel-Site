@@ -11,7 +11,7 @@ if (!is_dir(DATA_DIR)) {
 $checks = [
     ['PHP is running', true, 'Version ' . PHP_VERSION],
     ['Data folder exists', is_dir(DATA_DIR), DATA_DIR],
-    ['Data folder is writable', is_writable(DATA_DIR), is_writable(DATA_DIR) ? 'Visits can be saved' : 'Run: sudo chown my_webapp: ' . DATA_DIR],
+    ['Data folder is writable', is_writable(DATA_DIR), is_writable(DATA_DIR) ? 'Visits can be saved' : 'Run: sudo mkdir -p ' . DATA_DIR . ' && sudo chown my_webapp: ' . DATA_DIR],
 ];
 ?>
 <!doctype html>
@@ -47,6 +47,7 @@ $checks = [
   <div class="card">
     <h2>Coming soon</h2>
     <p>Jim and Suzanne's map for planning and recording visits around Ireland.</p>
+    <p class="detail">Update button test 1</p>
     <ul>
       <li>Interactive map of the counties, with visited ones highlighted</li>
       <li>Wishlist of places we want to go</li>
