@@ -58,7 +58,7 @@ Decided:
 
 - **Backend:** Plain PHP (My Webapp already runs PHP 8.4, so nothing extra to install). Small JSON APIs live in `api/`.
 - **Front end:** Plain JavaScript and CSS, no build step. Code in `assets/app.js` and `assets/app.css`.
-- **Map library:** Leaflet 1.9.4, copied into `assets/vendor/leaflet/` (no CDN). Background map tiles are CARTO "Positron" (light style built from OpenStreetMap data).
+- **Map library:** Leaflet 1.9.4, copied into `assets/vendor/leaflet/` (no CDN). Background map tiles are standard OpenStreetMap (no API key), faded to grey with CSS in `assets/app.css`.
 
 ## Design & UI
 
@@ -80,7 +80,7 @@ Decided:
 
 | Task | Command |
 |------|---------|
-| Run locally | No PHP on Jim's PC yet, so test on the live site. (Opening the map without PHP shows the map but can't save.) |
+| Run locally | In the project folder run `php -S localhost:8000`, then open http://localhost:8000. PHP 8.4 is installed with winget. Local test data goes in `Documents\GitHub\data\`, next to the repo. |
 | Deploy (first time) | Clone the repo into YunoHost My Webapp using SSH from the public repo |
 | Update | Push to GitHub, then press "Update from GitHub" at `/travelsite/admin/update.php` |
 

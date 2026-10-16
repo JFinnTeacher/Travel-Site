@@ -18,6 +18,10 @@ function fail(int $code, string $message): void
     exit;
 }
 
+if (!is_dir(DATA_DIR)) {
+    @mkdir(DATA_DIR, 0750, true);
+}
+
 // Open the data file (creating it if needed) and lock it, so two saves at once can't clash
 $fp = @fopen($file, 'c+');
 if (!$fp) {

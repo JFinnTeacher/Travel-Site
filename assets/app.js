@@ -9,10 +9,10 @@ const STYLE = {
 };
 
 const map = L.map('map', { zoomSnap: 0.25, minZoom: 6 });
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  subdomains: 'abcd',
+// Standard OpenStreetMap tiles (free, no key). app.css fades them to a light grey.
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
 let visits = {};     // { cork: { visited: true, updated: '2026-10-16' }, ... }
