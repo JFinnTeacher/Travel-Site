@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file guides Claude Code when working in this repository. Fill in each section and delete any that don't apply.
+This file guides Claude Code when working in this repository. The site is vibe coded with Claude, so this file focuses on **what** to build and **how to work with me**, not on coding detail.
 
 > **Project memory:** Shared notes that carry across computers are in [.claude/memory.md](.claude/memory.md) and load automatically through the import below. Keep that file committed to git.
 
@@ -10,154 +10,92 @@ This file guides Claude Code when working in this repository. Fill in each secti
 
 ## Project Overview
 
-<!-- One or two paragraphs: what the site is, who it's for, and why it exists. -->
-A website for tracking visits and activities around Ireland with my wife.
+A website for Jim and Suzanne to plan and record visits and activities around Ireland.
 
-- **Primary users:**
-- **Main goals:**
-- **Out of scope (for now):**
+- **Users:** Jim and Suzanne
+- **Main goal:** An interactive map of Ireland to plan and record visits
+- **Out of scope (for now):** European capital cities (possible future expansion)
 
-## Core Features
+## Features
 
-<!-- What the site needs to do. Mark each as MVP or later. -->
-- [ ] Log a visit (place, date, who went, notes)
+### MVP
+- [ ] Interactive map of Ireland showing counties, with visited counties highlighted
+- [ ] Wishlist of places we want to go
+- [ ] Plan activities in a county — one each for Jim and Suzanne
+- [ ] Log a visit (place, date, notes)
+
+### Later
 - [ ] Record activities at a place (hike, meal, attraction, etc.)
-- [ ] Map view of places visited
-- [ ] Photos for visits
+- [ ] Dropdown for each person to choose what they want to do
 - [ ] Ratings / favourites
-- [ ] "Wishlist" of places we want to go
-- [ ] Stats (counties visited, number of trips, etc.)
-- [ ]
+- [ ] Photos
+- [ ] Four levels of map highlight per county:
+  - [ ] One person chosen
+  - [ ] Both chosen
+  - [ ] One completed
+  - [ ] Both completed
+
+### Ideas / Someday
+- European capital cities
 
 ## Data Model
 
-<!-- Main entities and how they relate. -->
-- **Place:** name, county, coordinates, type, ...
-- **Visit:** place, date(s), who, notes, rating, ...
-- **Activity:** visit, type, description, ...
-- **Photo:**
-- **User:**
+- **Place:** name, county, address
+- **Visit:** place, date(s), who, notes, rating
+- **Activity:** visit, type, description
+- **Person:** Jim, Suzanne
+- **Photo:** (later)
 
-### Reference Data
-<!-- e.g. the list of 32 counties, provinces, place categories, where the data comes from. -->
+**Reference data** (county boundaries, place info): not settled. OpenStreetMap is the likely option — Claude to recommend.
 
 ## Tech Stack
 
-- **Frontend:**
-- **Backend / API:**
-- **Database:**
-- **Authentication:**
-- **Maps:** <!-- e.g. Leaflet + OpenStreetMap, Mapbox, Google Maps -->
-- **Image storage:**
-- **Hosting / Deployment:**
-- **Package manager:**
+Decided:
+- **Data storage:** JSON files
+- **Login:** None
+- **Image storage:** None (for now)
+- **Hosting:** Self-hosted on YunoHost using the My Webapp app (installed)
 
-## Project Structure
-
-<!-- Fill in once the skeleton exists. -->
-```
-/
-├── 
-└── 
-```
-
-## Getting Started
-
-### Prerequisites
-<!-- Node version, Python version, accounts needed, etc. -->
-
-### Setup
-```bash
-# install dependencies
-
-# set up environment variables
-
-# run locally
-```
-
-### Environment Variables
-<!-- Names and purpose only. Never put real secrets in this file. -->
-| Variable | Purpose |
-|----------|---------|
-|          |         |
-
-## Common Commands
-
-| Task | Command |
-|------|---------|
-| Run dev server | |
-| Build | |
-| Run tests | |
-| Lint / format | |
-| Deploy | |
-
-## Coding Conventions
-
-- **Language / style:**
-- **Naming:**
-- **Component / file organisation:**
-- **Formatting tools:**
-- **Comments & docs:**
+To decide (Claude to recommend, keeping it simple and easy to host on YunoHost):
+- **Backend:** JavaScript, Flask, or other
+- **Map library:** e.g. Leaflet + OpenStreetMap
 
 ## Design & UI
 
-- **Look and feel:**
-- **Colour palette / fonts:**
-- **Mobile-first?:** <!-- likely yes if logging visits on the go -->
-- **Accessibility requirements:**
+- **Look and feel:** Cleam modern lines similar to Android Material design
+- **Colours / fonts:** Whites and cool blues
+- **Mobile friendly:** Yes — visits may be logged on the go
 
-## Testing
+## Privacy & Hosting
 
-- **Framework:**
-- **What must be tested:**
-- **How to run:**
+- **Who can see it:** Jim and Suzanne only (private site)
+- **Backups:** Yunohost Backup
+- **How to deploy:** (Claude to fill in once the stack is chosen)
+- **Domain:** https://bawnaree.tail574fd7.ts.net/travelsite/
 
-## Git Workflow
+## Running the Site
 
-- **Branching:** <!-- e.g. feature branches off main -->
-- **Commit message style:**
-- **Pull requests:**
+(Claude to fill in once the project is set up — how to install, run locally, and deploy.)
 
-## Privacy & Security
-
-<!-- This is personal data. Who can see it? -->
-- **Public or private site?:**
-- **Who can log in / edit:**
-- **Location data / photo EXIF handling:**
-- **Backups:**
-
-## Deployment
-
-- **Where it's hosted:**
-- **How to deploy:**
-- **Domain:**
-
-## Roadmap
-
-### Phase 1 — MVP
--
-
-### Phase 2
--
-
-### Ideas / Someday
--
+| Task | Command |
+|------|---------|
+| Run locally | For Testing and updating|
+| Deploy (first time) | Clone the repo into YunoHost My Webapp using SSH from the public repo |
+| Update | Push to GitHub, then press "Update from GitHub" at `/travelsite/admin/update.php` |
 
 ## Instructions for Claude
 
-<!-- How you want Claude to work on this project. -->
+- I'm vibe coding this — explain changes in plain language and tell me how to try them.
 - Ask before adding new dependencies.
 - Keep changes small and explain them.
 - Update [.claude/memory.md](.claude/memory.md) when important decisions are made.
--
+- Fill in the "To decide" and "Running the Site" sections in this file as those get settled.
 
 ## Known Issues / Gotchas
 
--
+- **Keep data outside the code.** Data files (visits, wishlist, activities) must never live in the repo or the web folder. On the server they go in `/var/www/my_webapp/data/`, while the code lives in `/var/www/my_webapp/www/`. This means:
+  - `git pull` updates can never overwrite logged data
+  - the raw JSON can't be downloaded from a browser
+  - the data stays inside the app folder for YunoHost backups
 
-## Useful Links
-
-- **Repo:**
-- **Live site:**
-- **Design / mockups:**
-- **API docs:**
+  Build with this in mind: the data path must be a setting (not hard-coded inside `www/`), data files must be listed in `.gitignore`, and the app should create empty data files on first run if none exist.

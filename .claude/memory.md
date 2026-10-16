@@ -10,6 +10,9 @@ CLAUDE.md imports it, so Claude reads it at the start of each session.
 ## Decisions Log
 <!-- Format: YYYY-MM-DD — Decision — Why -->
 - 2026-10-16 — Project started; CLAUDE.md template and this memory file created.
+- 2026-10-16 — Hosting: YunoHost My Webapp app installed for this project. Code is cloned from GitHub into `/var/www/my_webapp/www/`.
+- 2026-10-16 — Updates: no 5-minute cron sync (updates will be sporadic). Instead an "Update from GitHub" button at `admin/update.php` runs `git pull --ff-only` on demand. SFTP is only for viewing/downloading data, never for uploading code.
+- 2026-10-16 — Data lives outside the code, in `/var/www/my_webapp/data/`, never in the repo or web folder, so pulls can't overwrite it and it can't be downloaded. See "Known Issues / Gotchas" in CLAUDE.md.
 
 ## Current Status
 <!-- What's in progress right now, and where you left off. Update at the end of each session. -->

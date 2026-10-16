@@ -1,0 +1,2 @@
+# Site data lives outside the code (see CLAUDE.md) — never commit it
+data/
