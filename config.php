@@ -9,6 +9,6 @@ define('DATA_DIR', dirname(__DIR__) . '/data');
 define('COUNTIES', [
     'antrim', 'armagh', 'carlow', 'cavan', 'clare', 'cork', 'donegal', 'down',
     'dublin', 'fermanagh', 'galway', 'kerry', 'kildare', 'kilkenny', 'laois', 'leitrim',
-    'limerick', 'londonderry', 'longford', 'louth', 'mayo', 'meath', 'monaghan', 'offaly',
+    'limerick', 'derry', 'longford', 'louth', 'mayo', 'meath', 'monaghan', 'offaly',
     'roscommon', 'sligo', 'tipperary', 'tyrone', 'waterford', 'westmeath', 'wexford', 'wicklow',
 ]);

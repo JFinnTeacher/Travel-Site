@@ -5,38 +5,44 @@
   --bg: #f5f8fc;
   --text: #1c2a3a;
   --muted: #5b6f85;
+  --line: #e6edf5;
   --bad: #c62828;
+  --page-width: 1100px;
   --shadow: 0 1px 3px rgba(20, 60, 110, .15), 0 4px 12px rgba(20, 60, 110, .1);
 }
 * { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
-body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
 
-/* Top app bar */
-.appbar { display: flex; align-items: center; gap: 12px; background: var(--blue); color: #fff; padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top)); box-shadow: 0 2px 4px rgba(20, 60, 110, .25); z-index: 1000; }
+/* Top app bar; its contents line up with the page column below */
+.appbar { position: sticky; top: 0; z-index: 1100; display: flex; align-items: center; gap: 12px; background: var(--blue); color: #fff; box-shadow: 0 2px 4px rgba(20, 60, 110, .25);
+  padding: 12px max(16px, calc((100% - var(--page-width)) / 2 + 16px)); padding-top: max(12px, env(safe-area-inset-top)); }
 .appbar h1 { margin: 0; font-size: 1.2rem; font-weight: 500; flex: 1; }
 .count { background: rgba(255, 255, 255, .18); border-radius: 16px; padding: 4px 12px; font-size: .85rem; }
 .icon-link { color: #fff; text-decoration: none; font-size: 1.2rem; opacity: .8; }
 .icon-link:hover { opacity: 1; }
 
-/* Map fills the rest of the screen */
-#map { flex: 1; background: var(--bg); }
+/* Page column that holds the map card and any future sections */
+.page { max-width: var(--page-width); margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.card { background: #fff; border-radius: 12px; box-shadow: var(--shadow); }
+
+.message { padding: 10px 16px; font-size: .9rem; border-left: 4px solid var(--bad); }
+
+/* Map card: a fixed-height box with the legend underneath */
+.map-card { overflow: hidden; }
+.map-box { position: relative; height: clamp(360px, 65vh, 720px); }
+#map { height: 100%; background: var(--bg); }
 .leaflet-container { font-family: inherit; }
 .leaflet-tile-pane { filter: grayscale(1) brightness(1.06) contrast(.85); } /* soften the busy OSM colours */
 .county-label { background: none; border: 0; box-shadow: none; color: var(--muted); font-size: 11px; font-weight: 500; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
 .county-label::before { display: none; }
 .hide-labels .county-label { display: none; }
 
-/* Cards floating over the map */
-.card { background: #fff; border-radius: 12px; box-shadow: var(--shadow); }
-.legend { position: absolute; left: 12px; bottom: 28px; z-index: 900; display: flex; gap: 14px; padding: 8px 12px; font-size: .8rem; color: var(--muted); }
+.legend { display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--muted); }
 .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--blue-light); border: 1px solid #8fb3e0; }
 .swatch.visited { background: var(--blue); border-color: var(--blue-dark); }
 
-.message { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 1100; padding: 10px 16px; font-size: .9rem; border-left: 4px solid var(--bad); max-width: calc(100% - 32px); }
-
-/* County details: a bottom sheet on phones, a side card on wider screens */
-.sheet { position: absolute; z-index: 1000; left: 0; right: 0; bottom: 0; border-radius: 16px 16px 0 0; padding: 20px 20px max(20px, env(safe-area-inset-bottom)); }
+/* County details: floats inside the map box — along the bottom on phones, top-right on wider screens */
+.sheet { position: absolute; z-index: 1000; left: 8px; right: 8px; bottom: 8px; padding: 20px; }
 .sheet h2 { margin: 2px 0 6px; font-size: 1.4rem; font-weight: 500; }
 .eyebrow { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .status { margin: 0 0 16px; color: var(--muted); }
@@ -49,5 +55,6 @@ body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--t
 .button:disabled { opacity: .6; cursor: default; }
 
 @media (min-width: 700px) {
-  .sheet { left: auto; right: 16px; bottom: auto; top: 76px; width: 320px; border-radius: 12px; padding: 20px; }
+  .page { padding: 24px 16px; }
+  .sheet { left: auto; bottom: auto; top: 12px; right: 12px; width: 300px; }
 }

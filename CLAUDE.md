@@ -46,7 +46,7 @@ A website for Jim and Suzanne to plan and record visits and activities around Ir
 - **Person:** Jim, Suzanne
 - **Photo:** (later)
 
-**Reference data:** County boundaries are the 32 traditional counties from OpenStreetMap (ODbL), simplified to ~100 m detail and saved as `assets/counties.geojson`. Each county has an `id` (e.g. `cork`, `londonderry`), `name`, `province` and `osm_id`. Place info: not settled yet.
+**Reference data:** County boundaries are the 32 traditional counties from OpenStreetMap (ODbL), simplified to ~100 m detail and saved as `assets/counties.geojson`. Each county has an `id` (e.g. `cork`, `derry`), `name`, `province` and `osm_id`. Place info: not settled yet.
 
 ## Tech Stack
 

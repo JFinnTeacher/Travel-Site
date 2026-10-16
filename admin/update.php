@@ -62,6 +62,9 @@ if ($canRun && $_SERVER['REQUEST_METHOD'] === 'POST') {
   pre { white-space: pre-wrap; margin: 0; font-size: .9rem; }
   .error { border-left: 4px solid #c62828; }
   .success { border-left: 4px solid #1e6fd9; }
+  .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e6edf5; }
+  .nav a { display: inline-block; background: #fff; color: #1e6fd9; text-decoration: none; border-radius: 20px; padding: 10px 24px; box-shadow: inset 0 0 0 1px #9dbbe3; }
+  .nav a:hover { background: #dce8f7; }
 </style>
 </head>
 <body>
@@ -85,6 +88,11 @@ if ($canRun && $_SERVER['REQUEST_METHOD'] === 'POST') {
       <button type="submit">Update from GitHub</button>
     </form>
   <?php endif; ?>
+
+  <nav class="nav">
+    <a href="../">Back to map</a>
+    <a href="./">Admin home</a>
+  </nav>
 </main>
 </body>
 </html>

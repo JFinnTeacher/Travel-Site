@@ -18,22 +18,29 @@
   <a class="icon-link" href="admin/" title="Site admin" aria-label="Site admin">⚙</a>
 </header>
 
-<div id="map" aria-label="Map of Ireland's counties"></div>
+<main class="page">
+  <div class="message card" id="message" hidden></div>
 
-<div class="legend card">
-  <span><i class="swatch visited"></i>Visited</span>
-  <span><i class="swatch"></i>Not yet</span>
-</div>
+  <!-- The map card. New sections (wishlist, visit log, …) go below it inside <main>. -->
+  <section class="card map-card">
+    <div class="map-box">
+      <div id="map" aria-label="Map of Ireland's counties"></div>
 
-<div class="message card" id="message" hidden></div>
+      <section class="sheet card" id="sheet" hidden aria-live="polite">
+        <button class="close" id="sheet-close" aria-label="Close">×</button>
+        <div class="eyebrow" id="sheet-province"></div>
+        <h2 id="sheet-name"></h2>
+        <p class="status" id="sheet-status"></p>
+        <button class="button" id="sheet-toggle"></button>
+      </section>
+    </div>
 
-<section class="sheet card" id="sheet" hidden aria-live="polite">
-  <button class="close" id="sheet-close" aria-label="Close">×</button>
-  <div class="eyebrow" id="sheet-province"></div>
-  <h2 id="sheet-name"></h2>
-  <p class="status" id="sheet-status"></p>
-  <button class="button" id="sheet-toggle"></button>
-</section>
+    <div class="legend">
+      <span><i class="swatch visited"></i>Visited</span>
+      <span><i class="swatch"></i>Not yet</span>
+    </div>
+  </section>
+</main>
 
 <script src="assets/vendor/leaflet/leaflet.js"></script>
 <script src="assets/app.js"></script>
