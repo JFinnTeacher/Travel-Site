@@ -7,7 +7,7 @@
   --muted: #5b6f85;
   --line: #e6edf5;
   --bad: #c62828;
-  --page-width: 1100px;
+  --page-width: 1400px;
   --shadow: 0 1px 3px rgba(20, 60, 110, .15), 0 4px 12px rgba(20, 60, 110, .1);
 }
 * { box-sizing: border-box; }
@@ -23,14 +23,16 @@ body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); col
 .icon-link:hover { opacity: 1; }
 
 /* Page column that holds the map card and any future sections */
-.page { max-width: var(--page-width); margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.page { max-width: var(--page-width); margin: 0 auto; padding: 8px; display: flex; flex-direction: column; gap: 16px; }
 .card { background: #fff; border-radius: 12px; box-shadow: var(--shadow); }
 
 .message { padding: 10px 16px; font-size: .9rem; border-left: 4px solid var(--bad); }
 
-/* Map card: a fixed-height box with the legend underneath */
+/* Map and status dashboard: side by side on wide screens, stacked on phones */
+.layout { display: flex; flex-direction: column; gap: 16px; }
 .map-card { overflow: hidden; }
-.map-box { position: relative; height: clamp(360px, 65vh, 720px); }
+/* Map fills the screen height, leaving room for the top bar and colour key below (dvh allows for phone browser bars) */
+.map-box { position: relative; height: max(380px, calc(100vh - 100px)); height: max(380px, calc(100dvh - 100px)); }
 #map { height: 100%; background: var(--bg); }
 .leaflet-container { font-family: inherit; }
 .leaflet-tile-pane { filter: grayscale(1) brightness(1.06) contrast(.85); } /* soften the busy OSM colours */
@@ -38,8 +40,22 @@ body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); col
 .county-label::before { display: none; }
 .hide-labels .county-label { display: none; }
 
-.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--muted); }
-.legend span { white-space: nowrap; }
+
+/* Status dashboard */
+.dashboard { padding: 16px 20px; }
+.dashboard h2 { margin: 0 0 12px; font-size: 1.15rem; font-weight: 500; }
+.dashboard h3 { margin: 18px 0 6px; font-size: .75rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.progress { height: 8px; border-radius: 4px; background: var(--blue-light); overflow: hidden; }
+.progress-bar { height: 100%; width: 0; border-radius: 4px; transition: width .3s; }
+.progress-text { margin: 6px 0 0; font-size: .9rem; color: var(--muted); }
+.dash-list { list-style: none; margin: 0; padding: 0; }
+.dash-list li { display: flex; align-items: center; padding: 4px 0; font-size: .9rem; }
+.dash-list li span { flex: 1; }
+.dash-people { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.dash-people th, .dash-people td { padding: 4px 0; text-align: right; font-weight: 400; }
+.dash-people thead th { font-size: .75rem; color: var(--muted); }
+.dash-people tbody th { text-align: left; }
+.dash-people td { font-weight: 600; }
 .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(20, 60, 110, .25); }
 
 /* County details: floats inside the map box — along the bottom on phones, top-right on wider screens */
@@ -64,6 +80,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); col
 .text-button { background: none; border: 0; padding: 4px 6px; font: inherit; font-size: .9rem; color: var(--blue); cursor: pointer; border-radius: 6px; }
 .text-button:hover { background: var(--blue-light); }
 .text-button.danger { color: var(--bad); }
+.text-button:disabled { color: var(--muted); background: none; cursor: default; }
 
 /* Places (pins) section of the county sheet */
 .places { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
@@ -87,6 +104,10 @@ body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); col
 .search-results button:hover { background: var(--blue-light); }
 .search-results .empty { padding: 8px 12px; font-size: .85rem; color: var(--muted); }
 
+/* Floating "+ Add place" button on the map (hidden while a box is open) */
+.fab { position: absolute; z-index: 1000; left: 12px; bottom: 12px; background: var(--blue); color: #fff; border: 0; border-radius: 24px; padding: 12px 20px; font: inherit; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(20, 60, 110, .35); }
+.fab:hover { background: var(--blue-dark); }
+
 /* "Tap the map" banner shown while placing a pin */
 .pick-banner { position: absolute; z-index: 1000; top: 8px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 16px; white-space: nowrap; font-size: .9rem; }
 .picking, .picking .leaflet-interactive { cursor: crosshair; }
@@ -95,7 +116,6 @@ body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); col
 .pin span { display: block; width: 20px; height: 20px; margin: 2px; background: var(--blue-dark); border: 2px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 1px 4px rgba(0, 0, 0, .35); }
 .pin.draft span { border-style: dashed; opacity: .8; } /* the place being added, not saved yet */
 .pin-swatch { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border-color: #fff; }
-.legend-break { flex-basis: 100%; height: 0; }
 .who-tag { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: .75rem; font-weight: 500; color: #fff; vertical-align: 1px; }
 .place-list .who-tag { margin-right: 4px; }
 
@@ -108,6 +128,12 @@ body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); col
 .leaflet-popup-content p { margin: 6px 0 0; white-space: pre-wrap; }
 
 @media (min-width: 700px) {
-  .page { padding: 24px 16px; }
+  .page { padding: 16px; }
+  .map-box { height: max(420px, calc(100vh - 82px)); height: max(420px, calc(100dvh - 82px)); }
   .sheet { left: auto; bottom: auto; top: 12px; right: 12px; width: 300px; }
+}
+
+/* Wide screens: dashboard in a column to the right of the map */
+@media (min-width: 900px) {
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: stretch; }
 }

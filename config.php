@@ -19,6 +19,35 @@ function load_settings(): array
     return is_array($settings) ? $settings : [];
 }
 
+// Default colours: one base colour for the county shading (see assets/colours.js) and one per pin owner.
+// Changed on the admin page and saved in DATA_DIR/settings.json under "colours".
+define('DEFAULT_COLOURS', [
+    'map' => '#1e6fd9',
+    'pins' => ['shared' => '#0d3d80', 'user1' => '#7e57c2', 'user2' => '#d81b60'],
+]);
+
+function is_colour($value): bool
+{
+    return is_string($value) && preg_match('/^#[0-9a-f]{6}$/i', $value) === 1;
+}
+
+// Colours to use: the saved ones, or the defaults for any not set
+function site_colours(): array
+{
+    $saved = load_settings()['colours'] ?? [];
+    $colours = DEFAULT_COLOURS;
+    if (is_colour($saved['map'] ?? null)) {
+        $colours['map'] = strtolower($saved['map']);
+    }
+    foreach ($colours['pins'] as $who => $default) {
+        $pin = is_array($saved['pins'] ?? null) ? ($saved['pins'][$who] ?? null) : null;
+        if (is_colour($pin)) {
+            $colours['pins'][$who] = strtolower($pin);
+        }
+    }
+    return $colours;
+}
+
 // Names to show for each person: the saved name, or the default if none is set
 function people_names(): array
 {

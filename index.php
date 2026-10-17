@@ -16,13 +16,15 @@ require __DIR__ . '/config.php';
 <header class="appbar">
   <h1>Ireland Travels</h1>
   <span class="count" id="count" hidden></span>
-  <a class="icon-link" href="admin/" title="Site admin" aria-label="Site admin">⚙</a>
+  <a class="icon-link" href="admin/" title="Settings" aria-label="Settings">⚙</a>
 </header>
 
 <main class="page">
   <div class="message card" id="message" hidden></div>
 
-  <!-- The map card. New sections (wishlist, visit log, …) go below it inside <main>. -->
+  <!-- Map on the left, status dashboard on the right (stacked on phones).
+       New sections (wishlist, visit log, …) go below this inside <main>. -->
+  <div class="layout">
   <section class="card map-card">
     <div class="map-box">
       <div id="map" aria-label="Map of Ireland's counties"></div>
@@ -56,8 +58,15 @@ require __DIR__ . '/config.php';
             <button class="text-button" id="place-add">+ Add place</button>
           </div>
           <ul class="place-list" id="place-list"></ul>
+        </div>
+      </section>
 
-          <form class="place-form" id="place-form" hidden>
+      <!-- Place box: search for and place a pin. Separate from the county box; only one shows at a time. -->
+      <section class="sheet card" id="pin-sheet" hidden aria-live="polite">
+        <button class="close" id="place-close" aria-label="Close">×</button>
+        <div class="eyebrow">Places</div>
+        <h2 id="pin-sheet-title">Add a place</h2>
+        <form class="place-form" id="place-form">
             <div class="row">
               <input id="place-name" maxlength="100" placeholder="Place name, e.g. Blarney Castle" required>
               <button type="button" class="button outlined" id="place-search">Search</button>
@@ -79,16 +88,38 @@ require __DIR__ . '/config.php';
               <button class="button" id="place-save">Save place</button>
               <button type="button" class="button outlined" id="place-cancel">Cancel</button>
             </div>
-          </form>
-        </div>
+        </form>
       </section>
+
+      <button class="fab" id="fab-add">+ Add place</button>
     </div>
 
-    <div class="legend" id="legend" aria-label="Colour key"></div>
   </section>
+
+  <!-- Status dashboard, filled in by renderDashboard() in assets/app.js. Its rows double as the colour key. -->
+  <aside class="card dashboard" aria-label="Status">
+    <h2>Status</h2>
+    <div class="progress"><div class="progress-bar" id="dash-bar"></div></div>
+    <p class="progress-text" id="dash-progress"></p>
+
+    <h3>Counties</h3>
+    <ul class="dash-list" id="dash-counties"></ul>
+
+    <h3>People</h3>
+    <table class="dash-people">
+      <thead><tr><th></th><th>Chosen</th><th>Done</th><th>Places</th></tr></thead>
+      <tbody id="dash-people"></tbody>
+    </table>
+
+    <h3>Places</h3>
+    <ul class="dash-list" id="dash-places"></ul>
+  </aside>
+  </div>
 </main>
 
 <script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/colours.js"></script>
+<script>const SITE_COLOURS = <?= json_encode(site_colours(), JSON_HEX_TAG) ?>;</script>
 <script src="assets/app.js"></script>
 </body>
 </html>

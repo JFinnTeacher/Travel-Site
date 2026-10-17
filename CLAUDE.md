@@ -75,7 +75,7 @@ Decided:
 
 ## Running the Site
 
-- Home page (`index.php`) is the county map. The ⚙ icon opens `admin/` (server checks + update button).
+- Home page (`index.php`) is the county map. The ⚙ icon opens `admin/` (Settings: user names, map and pin colours, update button). A warning appears there only if the data folder isn't writable.
 - Saved county status is in `DATA_DIR/counties.json`, created automatically on first use.
 
 | Task | Command |

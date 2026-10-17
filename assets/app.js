@@ -1,19 +1,23 @@
 // County map: draws the 32 counties on a Leaflet map, coloured by how far each person's
 // plan has got, and lets you tap a county to edit the plans (saved through api/counties.php).
 
-// The colour categories, in order. statusOf() picks one for each county; the legend is built from this list.
+// Colours come from the admin page (SITE_COLOURS, set in index.php). The county shades are
+// all worked out from one base colour by mapShades() in assets/colours.js.
+const SHADES = mapShades(SITE_COLOURS.map);
+
+// The colour categories, in order. statusOf() picks one for each county; the dashboard key is built from this list.
 const STATUSES = [
-  { key: 'none', label: 'Nothing planned', fill: '#dce8f7', opacity: 0.45 },
-  { key: 'one-chosen', label: 'One chosen', fill: '#9cc2f0', opacity: 0.7 },
-  { key: 'both-chosen', label: 'Both chosen', fill: '#3b82e0', opacity: 0.7 },
-  { key: 'one-done', label: 'One done', fill: '#6fcfc0', opacity: 0.75 },
-  { key: 'both-done', label: 'Both done', fill: '#00796b', opacity: 0.75 },
-];
+  { key: 'none', label: 'Nothing planned', opacity: 0.45 },
+  { key: 'one-chosen', label: 'One chosen', opacity: 0.7 },
+  { key: 'both-chosen', label: 'Both chosen', opacity: 0.7 },
+  { key: 'one-done', label: 'One done', opacity: 0.8 },
+  { key: 'both-done', label: 'Both done', opacity: 0.8 },
+].map((status) => ({ ...status, fill: SHADES[status.key] }));
 
 const STYLE = {
-  base: { color: '#8fb3e0', weight: 1 },
-  hover: { weight: 2.5, color: '#1859b0' },
-  selected: { weight: 3.5, color: '#0d3d80' },
+  base: { color: SHADES.border, weight: 1 },
+  hover: { weight: 2.5, color: SHADES.hover },
+  selected: { weight: 3.5, color: SHADES.selected },
 };
 
 const map = L.map('map', { zoomSnap: 0.25, minZoom: 6 });
@@ -70,6 +74,7 @@ function restyleAll() {
   const n = countiesLayer.getLayers().filter((l) => statusOf(l.feature.properties.id).key === 'both-done').length;
   $('count').textContent = `${n} of 32 done`;
   $('count').hidden = false;
+  renderDashboard();
 }
 
 function swatch(status) {
@@ -79,23 +84,57 @@ function swatch(status) {
   return el;
 }
 
-function buildLegend() {
-  const counties = STATUSES.map((status) => {
-    const item = document.createElement('span');
-    item.append(swatch(status), status.label);
-    return item;
-  });
-  // Pin colours: one per person, plus one for places for both
-  const pinKeys = ['', ...PEOPLE].map((who) => {
-    const item = document.createElement('span');
-    const mark = swatch({ fill: PIN_COLOURS[who] });
-    mark.classList.add('pin-swatch');
-    item.append(mark, who ? `${whoName(who)}'s places` : 'Shared places');
-    return item;
-  });
-  const br = document.createElement('span');
-  br.className = 'legend-break';
-  $('legend').replaceChildren(...counties, br, ...pinKeys);
+function pinSwatch(who) {
+  const mark = swatch({ fill: PIN_COLOURS[who || ''] });
+  mark.classList.add('pin-swatch');
+  return mark;
+}
+
+// One "colour mark · label · number" row for the dashboard lists
+function dashRow(mark, label, value) {
+  const li = document.createElement('li');
+  const text = document.createElement('span');
+  text.textContent = label;
+  const count = document.createElement('strong');
+  count.textContent = value;
+  li.append(mark, text, count);
+  return li;
+}
+
+// The status dashboard beside the map: overall progress, counties per colour category,
+// each person's totals, and places per pin colour. Its rows double as the colour key.
+function renderDashboard() {
+  if (!countiesLayer) return;
+  const ids = countiesLayer.getLayers().map((l) => l.feature.properties.id);
+  const counts = Object.fromEntries(STATUSES.map((s) => [s.key, 0]));
+  ids.forEach((id) => { counts[statusOf(id).key] += 1; });
+
+  const done = counts['both-done'];
+  $('dash-bar').style.width = `${(done / ids.length) * 100}%`;
+  $('dash-bar').style.background = SHADES['both-done'];
+  $('dash-progress').textContent = `${done} of ${ids.length} counties done by both`;
+
+  $('dash-counties').replaceChildren(...STATUSES.map((s) => dashRow(swatch(s), s.label, counts[s.key])));
+
+  $('dash-people').replaceChildren(...PEOPLE.map((person) => {
+    const plans = ids.map((id) => planOf(id, person));
+    const cells = [
+      plans.filter((p) => p.suggestion || p.done).length,
+      plans.filter((p) => p.done).length,
+      pins.filter((pin) => pin.who === person).length,
+    ];
+    const tr = document.createElement('tr');
+    const th = document.createElement('th');
+    th.textContent = whoName(person);
+    tr.append(th, ...cells.map((n) => Object.assign(document.createElement('td'), { textContent: n })));
+    return tr;
+  }));
+
+  $('dash-places').replaceChildren(...['', ...PEOPLE].map((who) => dashRow(
+    pinSwatch(who),
+    who ? `${whoName(who)}'s places` : 'Shared places',
+    pins.filter((pin) => (pin.who || '') === who).length,
+  )));
 }
 
 function showMessage(text) {
@@ -155,6 +194,7 @@ function openSheet(layer) {
   PEOPLE.forEach((person) => { textOf(person).value = planOf(layer.feature.properties.id, person).suggestion || ''; });
   renderSheet();
   $('sheet').hidden = false;
+  updateFab();
 }
 
 // Refresh the sheet's text and buttons for the selected county (leaves the suggestion boxes alone)
@@ -184,15 +224,15 @@ function closeSheet() {
   const previous = selected;
   if (!previous) return;
   saveSuggestions();
-  closePlaceForm();
   selected = null;
   previous.setStyle(styleFor(previous));
   $('sheet').hidden = true;
+  updateFab();
 }
 
 $('sheet-close').addEventListener('click', closeSheet);
-// Tapping the sea closes the sheet, unless we're picking a pin location
-map.on('click', (e) => (picking ? pickLocation(e.latlng) : closeSheet()));
+// Tapping the sea closes the county box, unless the place box is open (then a tap places the pin)
+map.on('click', (e) => (placeBoxOpen() ? pickLocation(e.latlng) : closeSheet()));
 
 PEOPLE.forEach((person) => {
   textOf(person).addEventListener('input', updateSaveButton);
@@ -216,8 +256,8 @@ let draft = null;          // the place being added or edited: { id?, name, note
 let draftMarker = null;    // its marker on the map while the form is open
 let picking = false;       // true while waiting for a tap on the map to place the pin
 
-// Pin colour by who the place is for: '' = both, otherwise a person id
-const PIN_COLOURS = { '': '#0d3d80', user1: '#7e57c2', user2: '#d81b60' };
+// Pin colour by who the place is for: '' = both, otherwise a person id (set on the admin page)
+const PIN_COLOURS = { ...SITE_COLOURS.pins, '': SITE_COLOURS.pins.shared };
 const whoName = (who) => (who ? personEl(who).dataset.name : 'Both');
 
 function pinIcon(who = '', extraClass = '') {
@@ -283,6 +323,37 @@ function renderPins() {
       .addTo(pinsLayer);
     pin.marker = marker;
   });
+  renderDashboard();
+}
+
+// Is a place already a line in this person's saved trip planner note?
+function inPlan(pin, person) {
+  const lines = (planOf(pin.county, person).suggestion || '').split('\n');
+  return lines.some((line) => line.trim().toLowerCase() === pin.name.toLowerCase());
+}
+
+// "+ Plan" button: copies the place name into the trip planner note of whoever it's for
+// (both people for a shared place) and saves it. Shows "In plan ✓" once it's there.
+function planButton(pin) {
+  const people = pin.who ? [pin.who] : PEOPLE;
+  const button = document.createElement('button');
+  button.className = 'text-button';
+  if (people.every((person) => inPlan(pin, person))) {
+    button.textContent = 'In plan ✓';
+    button.disabled = true;
+    return button;
+  }
+  button.textContent = '+ Plan';
+  button.title = `Add to ${people.map(whoName).join(' and ')}'s trip plan`;
+  button.addEventListener('click', () => {
+    people.filter((person) => !inPlan(pin, person)).forEach((person) => {
+      const box = textOf(person);
+      box.value = box.value.trim() ? `${box.value.trimEnd()}\n${pin.name}` : pin.name;
+    });
+    button.disabled = true;
+    saveSuggestions(); // also saves anything else typed in the boxes
+  });
+  return button;
 }
 
 // The list of places in the open county's sheet
@@ -308,7 +379,7 @@ function renderPlaceList() {
     del.addEventListener('click', () => {
       if (confirm(`Delete "${pin.name}"?`)) savePins({ action: 'delete', id: pin.id });
     });
-    li.append(show, whoTag(pin.who), edit, del);
+    li.append(show, whoTag(pin.who), planButton(pin), edit, del);
     if (pin.note) {
       const note = document.createElement('p');
       note.textContent = pin.note;
@@ -354,10 +425,12 @@ function openPlaceForm(pin = null) {
   $('place-note').value = pin ? pin.note : '';
   setWho(pin ? pin.who || '' : '');
   $('place-save').textContent = pin ? 'Save changes' : 'Save place';
+  $('pin-sheet-title').textContent = pin ? 'Edit place' : 'Add a place';
   if (pin) setDraftLocation(L.latLng(pin.lat, pin.lng), layerFor(pin.county));
   else updateWhere();
-  $('place-form').hidden = false;
-  $('place-add').hidden = true;
+  $('sheet').hidden = true; // the county box steps aside while the place box is open
+  $('pin-sheet').hidden = false;
+  updateFab();
   $('place-name').focus();
 }
 
@@ -370,14 +443,24 @@ function setWho(who) {
 }
 whoRadios().forEach((r) => r.addEventListener('change', () => setWho(getWho())));
 
+// Close the place box and bring back the county box if one was open
 function closePlaceForm() {
+  if (!draft) return;
   stopPicking();
   draft = null;
   if (draftMarker) draftMarker.remove();
   draftMarker = null;
-  $('place-form').hidden = true;
+  $('pin-sheet').hidden = true;
   $('place-results').hidden = true;
-  $('place-add').hidden = false;
+  if (selected) $('sheet').hidden = false;
+  updateFab();
+}
+
+const placeBoxOpen = () => draft !== null;
+
+// The map's "+ Add place" button shows only when no box is covering the map
+function updateFab() {
+  $('fab-add').hidden = !$('sheet').hidden || placeBoxOpen();
 }
 
 function updateWhere() {
@@ -385,8 +468,7 @@ function updateWhere() {
   if (draft.lat == null) {
     where.textContent = 'No location yet — search, or tap on the map';
   } else {
-    const other = draft.county !== selected.feature.properties.id;
-    where.textContent = `Location set${other ? ` (in County ${countyName(draft.county)})` : ''}`;
+    where.textContent = `Location set — County ${countyName(draft.county)}`;
   }
 }
 
@@ -399,7 +481,7 @@ function setDraftLocation(latlng, countyLayer) {
 
 function startPicking() {
   picking = true;
-  $('sheet').hidden = true;
+  $('pin-sheet').hidden = true;
   $('pick-banner').hidden = false;
   map.getContainer().classList.add('picking');
 }
@@ -409,7 +491,7 @@ function stopPicking() {
   picking = false;
   $('pick-banner').hidden = true;
   map.getContainer().classList.remove('picking');
-  if (selected) $('sheet').hidden = false;
+  $('pin-sheet').hidden = false;
 }
 
 function pickLocation(latlng) {
@@ -437,12 +519,12 @@ async function searchPlaces() {
       q, format: 'jsonv2', limit: '8', viewbox: '-11,55.5,-5.3,51.3', bounded: '1',
     })}`);
     if (!res.ok) throw new Error(res.statusText);
-    const here = selected.feature.properties.id;
+    const here = selected && selected.feature.properties.id;
     const found = (await res.json())
       .map((r) => ({ r, latlng: L.latLng(Number(r.lat), Number(r.lon)) }))
       .map((f) => ({ ...f, county: countyAt(f.latlng) }))
       .filter((f) => f.county)
-      // Results in the open county first
+      // Results in the open county (if any) first
       .sort((a, b) => (b.county.feature.properties.id === here) - (a.county.feature.properties.id === here));
     results.replaceChildren(...found.map(({ r, latlng, county }) => {
       const li = document.createElement('li');
@@ -476,7 +558,9 @@ async function searchPlaces() {
 }
 
 $('place-add').addEventListener('click', () => openPlaceForm());
+$('fab-add').addEventListener('click', () => openPlaceForm());
 $('place-cancel').addEventListener('click', closePlaceForm);
+$('place-close').addEventListener('click', closePlaceForm);
 $('place-tap').addEventListener('click', startPicking);
 $('pick-cancel').addEventListener('click', stopPicking);
 $('place-search').addEventListener('click', searchPlaces);
@@ -493,8 +577,8 @@ $('place-form').addEventListener('submit', async (e) => {
   $('place-save').disabled = false;
   if (!saved) return;
   closePlaceForm();
-  // A pin found in another county belongs there, so show that county's places
-  if (pin.county !== selected.feature.properties.id) openSheet(layerFor(pin.county));
+  // Show the county the pin is in, with the new place in its list
+  openSheet(layerFor(pin.county));
 });
 
 // ---- Load everything ----
@@ -523,7 +607,6 @@ async function loadPins() {
 }
 
 async function init() {
-  buildLegend();
   const [geo] = await Promise.all([
     fetch('assets/counties.geojson').then((r) => r.json()),
     loadCounties(),
@@ -536,7 +619,7 @@ async function init() {
         permanent: true, direction: 'center', className: 'county-label',
       });
       layer.on({
-        click: (e) => { L.DomEvent.stopPropagation(e); if (picking) pickLocation(e.latlng); else openSheet(layer); },
+        click: (e) => { L.DomEvent.stopPropagation(e); if (placeBoxOpen()) pickLocation(e.latlng); else openSheet(layer); },
         mouseover: () => { if (layer !== selected) layer.setStyle(STYLE.hover); },
         mouseout: () => layer.setStyle(styleFor(layer)),
       });
